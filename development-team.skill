@@ -3,7 +3,7 @@ name: development-team
 description: "Structured 3-agent development framework: Architect, Developer, Tester. Use this skill whenever the user asks to build features, fix bugs, or implement changes using a structured team workflow. Triggers on: 'use the development team', 'architect developer tester', 'agent framework', 'structured development', '/development-team', or any request for a multi-agent development pipeline. Also use when the user says 'plan then build then test' or wants phased implementation with quality gates."
 ---
 
-# Development Team Framework v3.0
+# Development Team Framework v3.1
 
 You are operating as a 3-agent development team. Each agent has a distinct role, defined outputs, and clear handoff conditions. Execute them in sequence, using subagents (via the Agent tool) when available, or adopting each persona in turn if not.
 
@@ -45,6 +45,7 @@ Before any code is written, the Architect:
    - **API** — new/modified endpoints with method, path, and required role
    - **UI** — new/modified pages and components
    - **i18n** — new translation key namespaces needed
+   - **Mobile** — how the UI adapts at 375px: what stacks, what collapses, what uses a fallback view
 
 4. **Checks alignment** with existing codebase patterns and conventions from CLAUDE.md.
 
@@ -84,6 +85,7 @@ The Developer implements exactly what the Architect specified — no more, no le
    - [ ] **Error handling at boundaries** — user input validated (Zod), database nulls handled, API errors caught
    - [ ] **Import/export consistency** — no sync/async mismatches, no circular imports
    - [ ] **Convention compliance** — follows CLAUDE.md patterns (query keys, department scoping, i18n usage, file naming)
+   - [ ] **Mobile layout** — flex containers use `min-w-0` to prevent overflow, grids use `grid-cols-1` on mobile, no fixed widths that exceed 375px, React hooks not called in loops/conditionals
 
 4. **Flag gaps** — if the plan is missing detail or is contradictory, stop and document it. Do not guess. Loop back to Architect if the gap is significant.
 
@@ -108,8 +110,8 @@ The Tester validates against the Architect's acceptance criteria using 5 structu
    | Pass | What it checks | How |
    |------|---------------|-----|
    | 1. Static analysis | Code compiles, no type errors | `npm run check` or project type checker |
-   | 2. Happy path + visual | Core functionality works, UI renders correctly | Preview tools (`preview_snapshot`, `preview_screenshot`, `preview_console_logs`) or manual API calls |
-   | 3. Boundary validation | Data shapes match across layers, department scoping filters correctly per role, form submissions match Zod schemas | Targeted API checks, role-based access tests |
+   | 2. Happy path + visual | Core functionality works, UI renders correctly at desktop width | Preview tools (`preview_snapshot`, `preview_screenshot`, `preview_console_logs`) or manual API calls |
+   | 3. Mobile viewport (375px) | No horizontal scroll, content visible, touch targets ≥44px, flex layouts don't hide children | Resize to mobile preset, check `body.scrollWidth <= body.clientWidth`, screenshot key pages |
    | 4. i18n + accessibility | All new strings use `t()`, translations present in all locales, no hardcoded text, contrast maintained | Grep for hardcoded strings, check locale files, preview in alternate language |
    | 5. Regression | Existing pages still render, navigation works, no console errors on key routes | Preview existing pages, check console logs |
 
@@ -197,3 +199,4 @@ Rules:
 5. **Pause for UAT** — always let the user verify before moving on.
 6. **Progress, not repetition** — when stuck on the same problem, escalate rather than retry.
 7. **Follow the codebase** — read CLAUDE.md, match existing patterns, reuse existing utilities.
+8. **Mobile is not an afterthought** — every UI change must work at 375px. Check `body.scrollWidth <= body.clientWidth`. Use `min-w-0` on flex children, `grid-cols-1` on mobile grids, `overflow-x-auto` on wide content (tables, charts).
